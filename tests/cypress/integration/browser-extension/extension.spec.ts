@@ -5,6 +5,8 @@ onlyOn('headed', () => {
     {
       browser: ['chromium', 'chrome'],
       defaultCommandTimeout: 8000,
+      viewportWidth: 1440,
+      viewportHeight: 900,
     },
     () => {
       const consent = () => {
@@ -12,7 +14,9 @@ onlyOn('headed', () => {
           .then(($body) => {
             // Agree to cookies dialog if it's present
             if ($body.find('#dialog').length) {
-              cy.get('#dialog [role="button"]').last().click();
+              cy.get('#dialog')
+                .contains('[role="button"]', 'Accept all', {matchCase: false})
+                .click();
             }
           })
       }
@@ -26,13 +30,13 @@ onlyOn('headed', () => {
       })
 
       it('shows Tournesol recommendations on youtube.com', () => {
-        cy.visit('https://www.youtube.com');
+        cy.visit('https://www.youtube.com?hl=en');
         consent();
         cy.contains('Recommended by Tournesol').should('be.visible');
       })
 
       it('shows "Rate later" button on video page', () => {
-        cy.visit('https://www.youtube.com/watch?v=6jK9bFWE--g');
+        cy.visit('https://www.youtube.com/watch?v=6jK9bFWE--g&hl=en');
         consent();
         cy.get('body').then($body => {
           if ($body.find("button:contains('Dismiss')").length > 0) {
